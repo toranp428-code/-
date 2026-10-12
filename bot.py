@@ -413,6 +413,21 @@ class GachaItemModal(discord.ui.Modal, title="ガチャ景品を追加"):
 
 @bot.event
 async def on_ready():
+    if not getattr(bot, "_commands_synced", False):
+        try:
+            guild_id = os.getenv("GUILD_ID", "").strip()
+            if guild_id:
+                guild = discord.Object(id=int(guild_id))
+                bot.tree.copy_global_to(guild=guild)
+                synced = await bot.tree.sync(guild=guild)
+                print(f"スラッシュコマンド登録成功（サーバー限定）：{len(synced)}個 / Guild ID: {guild_id}")
+            else:
+                synced = await bot.tree.sync()
+                print(f"スラッシュコマンド登録成功（グローバル）：{len(synced)}個")
+                print("グローバルコマンドはDiscord側で反映まで時間がかかる場合があります")
+            bot._commands_synced = True
+        except Exception as e:
+            print(f"スラッシュコマンド登録失敗：{type(e).__name__}: {e}")
     print(f"ログイン成功：{bot.user} (ID: {bot.user.id})")
 
 

@@ -41,3 +41,14 @@ python bot.py
 - 永続ディスクを追加する場合は `DATABASE_PATH` をディスク内のファイルパスに設定
 
 Discord Developer PortalのInstallationで、`bot` と `applications.commands` のスコープを付けてサーバーに招待してください
+
+
+## スラッシュコマンドが表示されない場合
+
+起動時にスラッシュコマンドをDiscordへ同期します。RenderのLogsで
+「スラッシュコマンド登録成功」または「スラッシュコマンド登録失敗」を確認してください。
+
+すぐ表示させてテストするには、RenderのEnvironmentに `GUILD_ID` を追加し、
+対象DiscordサーバーのIDを設定します。サーバーIDはDiscordのユーザー設定で
+開発者モードを有効にし、サーバーのメニューから「サーバーIDをコピー」で取得できます。
+Botの招待URLには `applications.commands` スコープも必要です。
