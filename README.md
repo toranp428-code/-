@@ -32,10 +32,12 @@ python bot.py
 
 ## Render
 - GitHubにこのフォルダの中身をアップロード
-- Renderで **Background Worker** を作成
+- Renderで **Web Service** を作成（この版はHTTPヘルスチェック用サーバーを内蔵）
 - Build Command: `pip install -r requirements.txt`
 - Start Command: `python bot.py`
 - Environment Variables: `DISCORD_TOKEN`
+- `/` または `/health` にアクセスするとHTTP 200を返します
+- 無料Web Serviceは一定時間アクセスがないとスリープすることがあり、その間Botもオフラインになります。24時間ずっとオンラインになる保証はありません
 - 永続ディスクを追加する場合は `DATABASE_PATH` をディスク内のファイルパスに設定
 
 Discord Developer PortalのInstallationで、`bot` と `applications.commands` のスコープを付けてサーバーに招待してください

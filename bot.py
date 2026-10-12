@@ -2,6 +2,8 @@ import os
 import random
 import sqlite3
 import asyncio
+import threading
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from datetime import datetime, timezone
 
 import discord
@@ -480,6 +482,36 @@ async def on_app_command_error(interaction: discord.Interaction, error: app_comm
         await interaction.response.send_message(message, ephemeral=True)
 
 
+class HealthHandler(BaseHTTPRequestHandler):
+    """Small HTTP endpoint for Render Web Service health checks."""
+    def do_GET(self):
+        if self.path not in ("/", "/health"):
+            self.send_response(404)
+            self.end_headers()
+            self.wfile.write(b"Not Found")
+            return
+        body = b"Penguin Discord Bot is running"
+        self.send_response(200)
+        self.send_header("Content-Type", "text/plain; charset=utf-8")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
+    def log_message(self, format, *args):
+        # Keep routine health checks from filling Render logs
+        return
+
+
+def start_http_server():
+    # Render provides PORT. Bind to 0.0.0.0 so Render can reach the service.
+    port = int(os.getenv("PORT", "10000"))
+    server = ThreadingHTTPServer(("0.0.0.0", port), HealthHandler)
+    thread = threading.Thread(target=server.serve_forever, name="health-http", daemon=True)
+    thread.start()
+    print(f"HTTPサーバー起動：0.0.0.0:{port} ( / と /health )")
+    return server
+
+
 async def main():
     if not TOKEN:
         raise RuntimeError("環境変数 DISCORD_TOKEN が設定されていません")
@@ -491,4 +523,5 @@ async def main():
 
 
 if __name__ == "__main__":
+    start_http_server()
     asyncio.run(main())
